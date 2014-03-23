@@ -190,7 +190,7 @@ func lsdue($date) {
         }
         $line_number++;
     }
-    close $todo_fh or croak "Clsoing file $todo_file: $ERRNO";;
+    close $todo_fh or croak "Closing file $todo_file: $ERRNO";;
 }
 
 func lscon($context) {
