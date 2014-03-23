@@ -33,7 +33,6 @@ use v5.10.1;
 
 use strict;
 use warnings;
-#use TERM::ANSIColor qw(:constants);
 use Carp;
 use Term::ANSIColor;
 use Readonly;
@@ -93,9 +92,7 @@ sub versioned_backup {
 
     chdir $backup_dir or croak "Could not cd to $backup_dir: $ERRNO";
 
-    # do the git stuff on the interesting files:
     my $git_cmd = 'git ' . $git_args;
-
     system $git_cmd and croak "Could not run git: $ERRNO";
 
     return;
@@ -173,8 +170,7 @@ func print_colored($line) {
 func lsdue($date) {
     my $due_date = get_canonical_date($date);
 
-    open my $todo_fh, '<', $todo_file
-        or croak "Could not open $todo_file: $ERRNO";
+    open my $todo_fh, '<', $todo_file or croak "Could not open $todo_file: $ERRNO";
     my $line_number = 1;
     while (my $line = <$todo_fh>) {
         debug "Checking: $line";
@@ -193,12 +189,10 @@ func lscon($context) {
 
 func lsprj($project) {
     ls_conditional('+' . $project);
-    exit;
 }
 
 func ls_conditional($condition) {
-    open my $TODO, '<', $todo_file
-        or croak "Could not open $todo_file: $ERRNO";
+    open my $TODO, '<', $todo_file or croak "Could not open $todo_file: $ERRNO";
     my $counter = 1;
     while (my $line = <$TODO>) {
         print_colored("$counter $line")     if $line =~ /$condition/ixms;
