@@ -29,35 +29,41 @@
 #
 # Emmerich Eggler, February 2013
 
+use v5.10.1;
+
 use strict;
 use warnings;
 #use TERM::ANSIColor qw(:constants);
+use Carp;
 use Term::ANSIColor;
+use Readonly;
+use English qw( -no_match_vars );
+use Method::Signatures;
 
 # Globals
-my $home = $ENV{'HOME'};
-my $todo_dir="$home/Dropbox/Ideas_and_more/todo/";
-my $todo_bin="./todo.sh";
-my $backup_dir="$home/Documents/Backups/todo/";
+my $home       = $ENV{'HOME'};
+my $todo_dir   = "$home/Dropbox/Ideas_and_more/todo/";
+my $todo_bin   = './todo.sh';
+my $backup_dir = "$home/Documents/Backups/todo/";
 
-my $todo_file = "todo.txt";
-my @files = ("done.txt", "report.txt", $todo_file);
+my $todo_file  = 'todo.txt';
+my @files = ('done.txt', 'report.txt', $todo_file);
 
 my $debug = 0;
 
-sub get_now_string() {
-    my @time_elems = localtime();
+sub get_now_string {
+    my @time_elems = localtime;
 
-    my $year = $time_elems[5] + 1900;
-    my $mon = $time_elems[4] + 1;
-    my $day = $time_elems[3];
-    my $hour = $time_elems[2];
+    my $year   = $time_elems[5] + 1900;
+    my $mon    = $time_elems[4] +    1;
+    my $day    = $time_elems[3];
+    my $hour   = $time_elems[2];
     my $minute = $time_elems[1];
     my $second = $time_elems[0];
 
-    if ($mon < 10) { $mon = "0$mon"; }
-    if ($day < 10) { $day = "0$day"; }
-    if ($hour < 10) { $hour = "0$hour"; }
+    if ($mon    < 10) { $mon    = "0$mon";    }
+    if ($day    < 10) { $day    = "0$day";    }
+    if ($hour   < 10) { $hour   = "0$hour";   }
     if ($minute < 10) { $minute = "0$minute"; }
     if ($second < 10) { $second = "0$second"; }
 
@@ -69,53 +75,60 @@ sub debug {
         my @debug_messages = @_;
         my $print_message = get_now_string();
         foreach my $elems (@debug_messages) {
-            $print_message .= " " . $elems;
+            $print_message .= ' ' . $elems;
         }
-        if ($print_message !~ /\n$/)  {
+        if ($print_message !~ /\n$/xms)  {
             $print_message .= "\n";
         }
 
-        warn $print_message;
+        croak $print_message;
     }
+
+    return;
 }
 
-sub versioned_backup() {
-    my $git_args = " commit -a -m \"commit by t\"";
+sub versioned_backup {
+    my $git_args = ' commit -a -m \"commit by t\"';
     backup();
 
-    chdir($backup_dir) or die "Could not cd to $backup_dir: $!";
+    chdir $backup_dir or croak "Could not cd to $backup_dir: $ERRNO";
 
     # do the git stuff on the interesting files:
-    my $git_cmd = "git ";
-    $git_cmd .= $git_args;
+    my $git_cmd = 'git ' . $git_args;
 
-    system($git_cmd) and die "Could not run git: $!";
+    system $git_cmd and croak "Could not run git: $ERRNO";
+
+    return;
 }
 
-sub backup() {
+sub backup {
 
-    unless ( -d $backup_dir) {
-        system("mkdir -p \"$backup_dir\"") and die "mkdir \"$backup_dir\": $! $?";
+    if (! -d $backup_dir) {
+        system "mkdir -p \"$backup_dir\"" and croak "mkdir \"$backup_dir\": $ERRNO $CHILD_ERROR";
     }
 
     foreach my $file (@files) {
-        system("cp $file \"$backup_dir\"") and die "Backup $file: $! $?";
+        system "cp $file \"$backup_dir\"" and croak "Backup $file: $ERRNO $CHILD_ERROR";
     }
+
+    return;
 }
 
-sub edit() {
-    system("vim todo.txt") and die "Could not edit: $! $?";
+sub edit {
+    system 'vim todo.txt' and croak "Could not edit: $ERRNO $CHILD_ERROR";
+
+    return;
 }
 
-sub help() {
-    print colored("$0 [backup|versioning|edit|e|due [<yyyy.mm.dd>]|lsc <context>"
-      . "|lsprj <project>|help] or the commands of todo.sh (see t -h)\n", "blue");
+sub help {
+    print colored("$PROGRAM_NAME [backup|versioning|edit|e|due [<yyyy.mm.dd>]|lsc <context>"
+        . '|lsprj <project>|help] or the commands of todo.sh (see t -h)\n', 'blue');
+
+    return;
 }
 
-sub get_canonical_date($) {
-    my $date = shift();
-
-    my ($year, $month, $day) = split(/\./, $date);
+func get_canonical_date($date) {
+    my ($year, $month, $day) = split /[.]/xms, $date;
 
     if (length($year ) == 2) {
         $year = 2000 + $year;
@@ -134,8 +147,8 @@ sub get_canonical_date($) {
 }
 
 
-sub today() {
-    my @time_elems = localtime();
+sub today {
+    my @time_elems = localtime;
     my $year = $time_elems[5] + 1900;
     my $mon = $time_elems[4] + 1;
     my $day = $time_elems[3];
@@ -146,114 +159,109 @@ sub today() {
     return "$year.$mon.$day";
 }
 
-sub print_colored($) {
-    my $line = shift();
-
-    if ($line =~ /^[0-9]*\s*\(A\)/) { print colored($line, 'yellow'); }
-    elsif ($line =~ /^[0-9]*\s*\(B\)/) { print colored($line, 'green'); }
-    elsif ($line =~ /^[0-9]*\s*\(C\)/) { print colored($line, 'blue'); }
-    elsif ($line =~ /^[0-9]*\s*\(D\)/) { print colored($line, 'cyan'); }
-    elsif ($line =~ /^[0-9]*\s*\(E\)/) { print colored($line, 'magenta'); }
-    else { print $line; }
+func print_colored($line) {
+    given ($line) {
+        when (/^\d*\s*[(]A[)]/xms) { print colored($line, 'yellow') }
+        when (/^\d*\s*[(]B[)]/xms) { print colored($line, 'green') }
+        when (/^\d*\s*[(]C[)]/xms) { print colored($line, 'blue') }
+        when (/^\d*\s*[(]D[)]/xms) { print colored($line, 'cyan') }
+        when (/^\d*\s*[(]E[)]/xms) { print colored($line, 'magenta') }
+        default { print $line; }
+    }
 }
 
-sub lsdue {
-    my $due_date = get_canonical_date(shift());
+func lsdue($date) {
+    my $due_date = get_canonical_date($date);
 
-    open(TODO, $todo_file)
-        or die "Could not open $todo_file: $!";
+    open my $todo_fh, '<', $todo_file
+        or croak "Could not open $todo_file: $ERRNO";
     my $line_number = 1;
-    foreach my $line (<TODO>) {
+    while (my $line = <$todo_fh>) {
         debug "Checking: $line";
-        if ($line !~ /due:([0-9]{2,4}\.[0-9]{1,2}\.[0-9]{1,2})/) {
+        if ($line !~ /due:(\d{2,4}[.]\d{1,2}[.]\d{1,2})/xms) {
             debug "Didn't find due date\n";
         }
-		else {
-        	my $entry_date = $1;
-        	my $canonical_entry_date = get_canonical_date($entry_date);
-        	if ($canonical_entry_date le $due_date) {
-            	print_colored($line_number . " " . $line);
-        	}
-		}	
-		$line_number++;
-
+        else {
+            my $entry_date = $1;
+            my $canonical_entry_date = get_canonical_date($entry_date);
+            if ($canonical_entry_date le $due_date) {
+                print_colored($line_number . q/ / . $line);
+            }
+        }
+        $line_number++;
     }
-    close(TODO);
+    close $todo_fh or croak "Clsoing file $todo_file: $ERRNO";;
 }
 
-sub lscon($) {
-    my $context = shift();
-
+func lscon($context) {
     ls_conditional("\\@" . $context);
 }
 
-sub lsprj($) {
-    my $project = shift();
-
+func lsprj($project) {
     ls_conditional("\\+$project");
     exit;
 }
 
-sub ls_conditional($) {
-    my $condition = shift();
-
-    open(TODO, $todo_file)
-        or die "Could not open $todo_file: $!";
+func ls_conditional($condition) {
+    open my $TODO, '<', $todo_file
+        or croak "Could not open $todo_file: $ERRNO";
     my $counter = 1;
-    foreach my $line (<TODO>) {
-        if ($line =~ /$condition/i) {
-            print_colored($counter . " " . $line);
+    while (my $line = <$TODO>) {
+        if ($line =~ /$condition/ixms) {
+            print_colored("$counter $line");
         }
         $counter++;
     }
+    close $TODO and croak("Could not close read-only file $todo_file: $ERRNO");
 }
 
 
-chdir($todo_dir) or die "Could not cd '$todo_dir': $! $?\n";
+chdir $todo_dir or croak "Could not cd '$todo_dir': $ERRNO\n";
 
 if ($#ARGV >= 0) {
-  my $first_cmd = $ARGV[0];
-  if ($first_cmd eq "backup") {
-    backup();
-    exit;
-  }
-  if ($first_cmd eq "edit" || $first_cmd eq "e") {
-    edit();
-    exit;
-  }
-  if ($first_cmd =~ /^vers/i) {
-    versioned_backup();
-    exit;
-  }
-  if ($first_cmd eq "due") {
-     if ($#ARGV >= 1) {
+    my $first_cmd = $ARGV[0];
+    if ($first_cmd eq 'backup') {
+        backup();
+        exit;
+    }
+    if ($first_cmd eq 'edit' || $first_cmd eq 'e') {
+        edit();
+        exit;
+    }
+    if ($first_cmd =~ /^vers/ixms) {
+        versioned_backup();
+        exit;
+    }
+    if ($first_cmd eq 'due') {
+        if ($#ARGV >= 1) {
+            my $second_cmd = $ARGV[1];
+            lsdue($second_cmd);
+        }
+        else {
+            lsdue(today());
+        }
+        exit;
+    }
+    if ($first_cmd eq 'lsc' and $#ARGV >= 1) {
         my $second_cmd = $ARGV[1];
-        lsdue($second_cmd);
-      }
-      else {
-        lsdue(today());
-      }
-      exit;
-  }
-  if ($first_cmd eq "lsc" and $#ARGV >= 1) {
-    my $second_cmd = $ARGV[1];
-    lscon($second_cmd);
-    exit;
-  }
-  if ($first_cmd eq "lsprj" and $#ARGV >= 1) {
-    my $second_cmd = $ARGV[1];
-    lsprj($second_cmd);
-    exit;
-  }
-  if ($first_cmd eq "help") {
-    help();
-    exit;
-  }
+        lscon($second_cmd);
+        exit;
+    }
+    if ($first_cmd eq 'lsprj' and $#ARGV >= 1) {
+        my $second_cmd = $ARGV[1];
+        lsprj($second_cmd);
+        exit;
+    }
+    if ($first_cmd eq 'help') {
+        help();
+        exit;
+    }
 }
 
-my $cmd = "$todo_bin ";
-for (my $i = 0; $i <= $#ARGV; $i++) {
-  $cmd .= " " . $ARGV[$i];
+my $cmd = $todo_bin . q/ /;
+for my $arg (@ARGV) {
+    $cmd .= q/ / . $arg;
 }
-system("$cmd");
+
+system "$cmd";
 
