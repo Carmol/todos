@@ -194,11 +194,11 @@ func lsdue($date) {
 }
 
 func lscon($context) {
-    ls_conditional("\\@" . $context);
+    ls_conditional('@' . $context);
 }
 
 func lsprj($project) {
-    ls_conditional("\\+$project");
+    ls_conditional('+' . $project);
     exit;
 }
 
