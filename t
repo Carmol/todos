@@ -212,13 +212,13 @@ if ($#ARGV >= 0) {
     }
 
     given ($first_cmd) {
-        when (/^backup$/xms)                { backup()           }
-        when (/^edit$/xms || /^e$/xms)      { edit()             }
-        when (/^vers/xms)                   { versioned_backup() }
-        when (/^due$/xms)                   { lsdue($second_cmd) }
-        when (/^lsc$/xms)                   { lscon($second_cmd) }
-        when (/^lsprj$/xms)                 { lsprj($second_cmd) }
-        when (/^h/xms)                      { help()             }
+        when (/^backup$/xms)                { backup();           exit; }
+        when (/^edit$/xms || /^e$/xms)      { edit();             exit; }
+        when (/^vers/xms)                   { versioned_backup(); exit; }
+        when (/^due$/xms)                   { lsdue($second_cmd); exit; }
+        when (/^lsc$/xms)                   { lscon($second_cmd); exit; }
+        when (/^lsprj$/xms)                 { lsprj($second_cmd); exit; }
+        when (/^h/xms)                      { help();             exit; }
     }
 
     exit;
