@@ -206,42 +206,22 @@ chdir $todo_dir or croak "Could not cd '$todo_dir': $ERRNO\n";
 
 if ($#ARGV >= 0) {
     my $first_cmd = $ARGV[0];
-    if ($first_cmd eq 'backup') {
-        backup();
-        exit;
+    my $second_cmd = today();
+    if ($#ARGV >= 1) {
+        $second_cmd = $ARGV[1];
     }
-    if ($first_cmd eq 'edit' || $first_cmd eq 'e') {
-        edit();
-        exit;
+
+    given ($first_cmd) {
+        when (/^backup$/xms)                { backup()           }
+        when (/^edit$/xms || /^e$/xms)      { edit()             }
+        when (/^vers/xms)                   { versioned_backup() }
+        when (/^due$/xms)                   { lsdue($second_cmd) }
+        when (/^lsc$/xms)                   { lscon($second_cmd) }
+        when (/^lsprj$/xms)                 { lsprj($second_cmd) }
+        default                             { help()             }
     }
-    if ($first_cmd =~ /^vers/ixms) {
-        versioned_backup();
-        exit;
-    }
-    if ($first_cmd eq 'due') {
-        if ($#ARGV >= 1) {
-            my $second_cmd = $ARGV[1];
-            lsdue($second_cmd);
-        }
-        else {
-            lsdue(today());
-        }
-        exit;
-    }
-    if ($first_cmd eq 'lsc' and $#ARGV >= 1) {
-        my $second_cmd = $ARGV[1];
-        lscon($second_cmd);
-        exit;
-    }
-    if ($first_cmd eq 'lsprj' and $#ARGV >= 1) {
-        my $second_cmd = $ARGV[1];
-        lsprj($second_cmd);
-        exit;
-    }
-    if ($first_cmd eq 'help') {
-        help();
-        exit;
-    }
+
+    exit;
 }
 
 my $cmd = $todo_bin . q/ /;
