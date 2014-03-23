@@ -178,16 +178,10 @@ func lsdue($date) {
     my $line_number = 1;
     while (my $line = <$todo_fh>) {
         debug "Checking: $line";
-        if ($line !~ /due:(\d{2,4}[.]\d{1,2}[.]\d{1,2})/xms) {
-            debug "Didn't find due date\n";
-        }
-        else {
-            my $entry_date = $1;
-            my $canonical_entry_date = get_canonical_date($entry_date);
-            if ($canonical_entry_date le $due_date) {
-                print_colored($line_number . q/ / . $line);
-            }
-        }
+        $line =~ /due:(\d{2,4}[.]\d{1,2}[.]\d{1,2})/xms;
+        my $entry_date = $1;
+        my $canonical_entry_date = get_canonical_date($entry_date);
+        print_colored($line_number . q/ / . $line)  if $canonical_entry_date le $due_date;
         $line_number++;
     }
     close $todo_fh or croak "Closing file $todo_file: $ERRNO";;
@@ -207,9 +201,7 @@ func ls_conditional($condition) {
         or croak "Could not open $todo_file: $ERRNO";
     my $counter = 1;
     while (my $line = <$TODO>) {
-        if ($line =~ /$condition/ixms) {
-            print_colored("$counter $line");
-        }
+        print_colored("$counter $line")     if $line =~ /$condition/ixms;
         $counter++;
     }
     close $TODO and croak("Could not close read-only file $todo_file: $ERRNO");
