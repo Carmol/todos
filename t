@@ -218,12 +218,13 @@ if ($#ARGV >= 0) {
         when (/^due$/xms)                   { lsdue($second_cmd) }
         when (/^lsc$/xms)                   { lscon($second_cmd) }
         when (/^lsprj$/xms)                 { lsprj($second_cmd) }
-        default                             { help()             }
+        when (/^h/xms)                      { help()             }
     }
 
     exit;
 }
 
+# Otherwise call the regular todo.sh
 my $cmd = $todo_bin . q/ /;
 for my $arg (@ARGV) {
     $cmd .= q/ / . $arg;
