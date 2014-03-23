@@ -27,7 +27,7 @@
 #
 #
 #
-# Emmerich Eggler, February 2013
+# ee, February 2013
 
 use v5.10.1;
 
