@@ -209,10 +209,5 @@ if ($#ARGV >= 0) {
 }
 
 # Otherwise call the regular todo.sh
-my @cmd = ($TODO_BIN);
-for my $arg (@ARGV) {
-    push @cmd, $arg;
-}
-
-system @cmd;
+system $TODO_BIN, @ARGV;
 
