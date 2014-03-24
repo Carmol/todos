@@ -126,8 +126,8 @@ func get_canonical_date($date) {
     my ($year, $month, $day) = split /[.]/xms, $date;
 
     if (length($year)  <= 2) { $year  = 2000 +  $year; }
-    if (length($month) == 1) { $month =   10 + $month; }
-    if (length($day)   == 1) { $day   =   10 +   $day; }
+    if (length($month) == 1) { $month = "0$month";     }
+    if (length($day)   == 1) { $day   = "0$day";       }
     
     my $ret_val = "$year.$month.$day";
 
