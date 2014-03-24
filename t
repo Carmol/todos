@@ -74,27 +74,20 @@ sub get_now_string {
 
 sub debug {
     if ($DEBUG) {
-        my @debug_messages = @_;
-        my $print_message = get_now_string();
-        foreach my $elems (@debug_messages) {
-            $print_message .= ' ' . $elems;
-        }
-        if ($print_message !~ /\n$/xms)  {
-            $print_message .= "\n";
+        my @print_message = (get_now_string());
+        push @print_message, $ARG;
+        if ($print_message[-1] !~ /\n$/xms)  {
+            push @print_message, "\n";
         }
 
-        croak $print_message;
+        croak @print_message;
     }
-
-    return;
 }
 
 sub versioned_backup {
     backup();
     chdir $BACKUP_DIR or croak "Could not cd to $BACKUP_DIR: $ERRNO";
     system $GIT_CMD, @GIT_ARGS and croak "Could not run $GIT_CMD: $ERRNO";
-
-    return;
 }
 
 sub backup {
@@ -105,25 +98,19 @@ sub backup {
     foreach my $file (@FILES) {
         system @COPY_BACK_CMD and croak "Backup $file: $ERRNO $CHILD_ERROR";
     }
-
-    return;
 }
 
 sub edit {
     system @EDIT_CMD and croak "Could not edit: $ERRNO $CHILD_ERROR";
-
-    return;
 }
 
 sub help {
     print colored("$PROGRAM_NAME [backup|versioning|edit|e|due [<yyyy.mm.dd>]|lsc <context>"
         . "|lsprj <project>|help] or the commands of todo.sh (see t -h)\n", 'blue');
-
-    return;
 }
 
 func get_canonical_date($date) {
-    my ($year, $month, $day) = split /[.]/xms, $date;
+    my ($year, $month, $day) = split q/./, $date;
 
     if (length($year)  <= 2) { $year  = 2000 +  $year; }
     if (length($month) == 1) { $month = "0$month";     }
