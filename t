@@ -75,7 +75,7 @@ sub get_now_string {
 sub debug {
     if ($DEBUG) {
         my @print_message = (get_now_string());
-        push @print_message, $ARG;
+        push @print_message, @ARG;
         if ($print_message[-1] !~ /\n$/xms)  {
             push @print_message, "\n";
         }
