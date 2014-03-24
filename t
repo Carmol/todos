@@ -169,8 +169,10 @@ func lsdue($date) {
         debug "Checking: $line";
         $line =~ /due:(\d{2,4}[.]\d{1,2}[.]\d{1,2})/xms;
         my $entry_date = $1;
-        my $canonical_entry_date = get_canonical_date($entry_date);
-        print_colored($line_number . q/ / . $line)  if $canonical_entry_date le $due_date;
+        if (defined $entry_date) {
+            my $canonical_entry_date = get_canonical_date($entry_date);
+            print_colored($line_number . q/ / . $line)  if $canonical_entry_date le $due_date;
+        }
         $line_number++;
     }
     close $todo_fh or croak "Closing file $TODO_FILE: $ERRNO";;
