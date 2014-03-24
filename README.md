@@ -1,8 +1,5 @@
-t
-=
-
-Wrapper and Frontend around todo.sh
-----------------------
+t - A Wrapper and Frontend around todo.sh
+================
 
 Calls todo.sh where it is installed ($TODO_DIR).
 t can be installed in the path; it chdirs to $TODO_DIR and calls
