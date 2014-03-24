@@ -92,8 +92,8 @@ sub versioned_backup {
 
     chdir $backup_dir or croak "Could not cd to $backup_dir: $ERRNO";
 
-    my $git_cmd = 'git ' . $git_args;
-    system $git_cmd and croak "Could not run git: $ERRNO";
+    my $git_cmd = 'git ';
+    system $git_cmd, $git_args and croak "Could not run git: $ERRNO";
 
     return;
 }
@@ -101,18 +101,18 @@ sub versioned_backup {
 sub backup {
 
     if (! -d $backup_dir) {
-        system "mkdir -p \"$backup_dir\"" and croak "mkdir \"$backup_dir\": $ERRNO $CHILD_ERROR";
+        system 'mkdir', '-p', "$backup_dir" and croak "mkdir \"$backup_dir\": $ERRNO $CHILD_ERROR";
     }
 
     foreach my $file (@files) {
-        system "cp $file \"$backup_dir\"" and croak "Backup $file: $ERRNO $CHILD_ERROR";
+        system 'cp', $file, "$backup_dir" and croak "Backup $file: $ERRNO $CHILD_ERROR";
     }
 
     return;
 }
 
 sub edit {
-    system 'vim todo.txt' and croak "Could not edit: $ERRNO $CHILD_ERROR";
+    system 'vim', "todo.txt" and croak "Could not edit: $ERRNO $CHILD_ERROR";
 
     return;
 }
@@ -225,10 +225,10 @@ if ($#ARGV >= 0) {
 }
 
 # Otherwise call the regular todo.sh
-my $cmd = $todo_bin . q/ /;
+my @cmd = ($todo_bin);
 for my $arg (@ARGV) {
-    $cmd .= q/ / . $arg;
+    push @cmd, $arg;
 }
 
-system "$cmd";
+system @cmd;
 
