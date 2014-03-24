@@ -119,7 +119,7 @@ sub edit {
 
 sub help {
     print colored("$PROGRAM_NAME [backup|versioning|edit|e|due [<yyyy.mm.dd>]|lsc <context>"
-        . '|lsprj <project>|help] or the commands of todo.sh (see t -h)\n', 'blue');
+        . "|lsprj <project>|help] or the commands of todo.sh (see t -h)\n", 'blue');
 
     return;
 }
