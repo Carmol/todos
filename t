@@ -2,8 +2,8 @@
 #
 # t         Wrapper around todo.sh
 #
-# Calls todo.sh where it is installed ($todo_dir).
-# t can be installed in the path; it chdirs to $todo_dir and calls
+# Calls todo.sh where it is installed ($TODO_DIR).
+# t can be installed in the path; it chdirs to $TODO_DIR and calls
 # todo.sh there.
 #
 # The following commands/arguments are added to the classical
@@ -11,7 +11,7 @@
 # 
 # backup
 #   If the command backup is given (e.g., "t backup"), t backups the
-#   three files done.txt, report.txt and todo.txt to $backup_dir.
+#   three files done.txt, report.txt and todo.txt to $BACKUP_DIR.
 #
 # versioning
 #   Uses git to do a versioned backup; no message entry possible, yet.
@@ -40,15 +40,13 @@ use English qw( -no_match_vars );
 use Method::Signatures;
 
 # Globals
-my $home       = $ENV{'HOME'};
-my $todo_dir   = "$home/Dropbox/Ideas_and_more/todo/";
-my $todo_bin   = './todo.sh';
-my $backup_dir = "$home/Documents/Backups/todo/";
-
-my $todo_file  = 'todo.txt';
-my @files = ('done.txt', 'report.txt', $todo_file);
-
-my $debug = 0;
+Readonly my $HOME       => $ENV{'HOME'};
+Readonly my $TODO_DIR   => "$HOME/Dropbox/Ideas_and_more/todo/";
+Readonly my $TODO_BIN   => './todo.sh';
+Readonly my $BACKUP_DIR => "$HOME/Documents/Backups/todo/";
+Readonly my $TODO_FILE  => 'todo.txt';
+Readonly my @FILES      => ('done.txt', 'report.txt', $TODO_FILE);
+Readonly my $DEBUG      => 0;
 
 sub get_now_string {
     my @time_elems = localtime;
@@ -70,7 +68,7 @@ sub get_now_string {
 }
 
 sub debug {
-    if ($debug) {
+    if ($DEBUG) {
         my @debug_messages = @_;
         my $print_message = get_now_string();
         foreach my $elems (@debug_messages) {
@@ -90,7 +88,7 @@ sub versioned_backup {
     my $git_args = ' commit -a -m \"commit by t\"';
     backup();
 
-    chdir $backup_dir or croak "Could not cd to $backup_dir: $ERRNO";
+    chdir $BACKUP_DIR or croak "Could not cd to $BACKUP_DIR: $ERRNO";
 
     my $git_cmd = 'git ';
     system $git_cmd, $git_args and croak "Could not run git: $ERRNO";
@@ -100,12 +98,12 @@ sub versioned_backup {
 
 sub backup {
 
-    if (! -d $backup_dir) {
-        system 'mkdir', '-p', "$backup_dir" and croak "mkdir \"$backup_dir\": $ERRNO $CHILD_ERROR";
+    if (! -d $BACKUP_DIR) {
+        system 'mkdir', '-p', "$BACKUP_DIR" and croak "mkdir '$BACKUP_DIR': $ERRNO $CHILD_ERROR";
     }
 
-    foreach my $file (@files) {
-        system 'cp', $file, "$backup_dir" and croak "Backup $file: $ERRNO $CHILD_ERROR";
+    foreach my $file (@FILES) {
+        system 'cp', $file, "$BACKUP_DIR" and croak "Backup $file: $ERRNO $CHILD_ERROR";
     }
 
     return;
@@ -170,7 +168,7 @@ func print_colored($line) {
 func lsdue($date) {
     my $due_date = get_canonical_date($date);
 
-    open my $todo_fh, '<', $todo_file or croak "Could not open $todo_file: $ERRNO";
+    open my $todo_fh, '<', $TODO_FILE or croak "Could not open $TODO_FILE: $ERRNO";
     my $line_number = 1;
     while (my $line = <$todo_fh>) {
         debug "Checking: $line";
@@ -180,7 +178,7 @@ func lsdue($date) {
         print_colored($line_number . q/ / . $line)  if $canonical_entry_date le $due_date;
         $line_number++;
     }
-    close $todo_fh or croak "Closing file $todo_file: $ERRNO";;
+    close $todo_fh or croak "Closing file $TODO_FILE: $ERRNO";;
 }
 
 func lscon($context) {
@@ -192,17 +190,17 @@ func lsprj($project) {
 }
 
 func ls_conditional($condition) {
-    open my $TODO, '<', $todo_file or croak "Could not open $todo_file: $ERRNO";
+    open my $TODO, '<', $TODO_FILE or croak "Could not open $TODO_FILE: $ERRNO";
     my $counter = 1;
     while (my $line = <$TODO>) {
         print_colored("$counter $line")     if $line =~ /$condition/ixms;
         $counter++;
     }
-    close $TODO and croak("Could not close read-only file $todo_file: $ERRNO");
+    close $TODO and croak("Could not close read-only file $TODO_FILE: $ERRNO");
 }
 
 
-chdir $todo_dir or croak "Could not cd '$todo_dir': $ERRNO\n";
+chdir $TODO_DIR or croak "Could not cd '$TODO_DIR': $ERRNO\n";
 
 if ($#ARGV >= 0) {
     my $first_cmd = $ARGV[0];
@@ -225,7 +223,7 @@ if ($#ARGV >= 0) {
 }
 
 # Otherwise call the regular todo.sh
-my @cmd = ($todo_bin);
+my @cmd = ($TODO_DIR);
 for my $arg (@ARGV) {
     push @cmd, $arg;
 }
