@@ -50,7 +50,7 @@ Readonly my $DEBUG          => 0;
 Readonly my $GIT_CMD        => 'git';
 Readonly my @GIT_ARGS       => qw(commit -a -m "commit by t");
 Readonly my @MKDIR_CMD_ARGS => qw(mkdir -p "$BACKUP_DIR");
-Readonly my @COPY_BACK_CMD  => qw(cp $file "$BACKUP_DIR");
+Readonly my $COPY_CMD       => q(cp);
 Readonly my @EDIT_CMD       => qw(vim $TODO_FILE);
 
 sub get_now_string {
@@ -80,7 +80,7 @@ sub debug {
             push @print_message, "\n";
         }
 
-        croak @print_message;
+        carp @print_message;
     }
 }
 
@@ -96,7 +96,7 @@ sub backup {
     }
 
     foreach my $file (@FILES) {
-        system @COPY_BACK_CMD and croak "Backup $file: $ERRNO $CHILD_ERROR";
+        system $COPY_CMD, $file, $BACKUP_DIR  and croak "Backup $file: $ERRNO $CHILD_ERROR";
     }
 }
 
@@ -185,7 +185,6 @@ func ls_conditional($condition) {
 
 # Start of the program
 chdir $TODO_DIR or croak "Could not cd '$TODO_DIR': $ERRNO\n";
-
 
 if ($#ARGV >= 0) {
     my $first_cmd = $ARGV[0];
