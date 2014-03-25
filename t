@@ -205,5 +205,8 @@ if ($#ARGV >= 0) {
 }
 
 # Otherwise call the regular todo.sh
+# Is this too dangerous, to just pass the command line args to todo.sh?
+# I'm not sure. Since this is direct user input, any user could directly
+# destroy his or her todo.txt or whatever directly with the more ease...
 system $TODO_BIN, @ARGV;
 
