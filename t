@@ -202,9 +202,6 @@ if ($#ARGV >= 0) {
         when (/^lsprj$/xms)                 { lsprj($second_cmd); exit; }
         when (/^h/xms)                      { help();             exit; }
     }
-
-    # End, as we already called our custom commands
-    exit;
 }
 
 # Otherwise call the regular todo.sh
