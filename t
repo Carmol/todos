@@ -72,6 +72,19 @@ sub get_now_string {
     return "$year.$mon.$day $hour:$minute:$second";
 }
 
+
+sub today {
+    my @time_elems = localtime;
+    my $year = $time_elems[5] + 1900;
+    my $mon = $time_elems[4] + 1;
+    my $day = $time_elems[3];
+
+    if ($mon < 10) { $mon = "0$mon"; }
+    if ($day < 10) { $day = "0$day"; }
+
+    return "$year.$mon.$day";
+}
+
 sub debug {
     if ($DEBUG) {
         my @print_message = (get_now_string());
@@ -165,7 +178,7 @@ chdir $TODO_DIR or croak "Could not cd '$TODO_DIR': $ERRNO\n";
 
 if ($#ARGV >= 0) {
     my $first_cmd = $ARGV[0];
-    my $second_cmd;
+    my $second_cmd = today();
     if ($#ARGV >= 1) {
         $second_cmd = $ARGV[1];
     }
