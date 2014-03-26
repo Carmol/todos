@@ -51,7 +51,7 @@ Readonly my $GIT_CMD        => 'git';
 Readonly my @GIT_ARGS       => qw(commit -a -m "commit by t");
 Readonly my @MKDIR_CMD_ARGS => qw(mkdir -p "$BACKUP_DIR");
 Readonly my $COPY_CMD       => q(cp);
-Readonly my @EDIT_CMD       => qw(vim $TODO_FILE);
+Readonly my @EDIT_CMD       => qq(vim $TODO_FILE);
 
 sub get_now_string {
     my @time_elems = localtime;
@@ -150,14 +150,12 @@ func print_colored($line) {
 func lsdue($date) {
     my $due_date = get_canonical_date($date);
 
-    open my $todo_fh, '<', $TODO_FILE or croak "Could not open $TODO_FILE: $ERRNO";
     my $line_number = 1;
+    open my $todo_fh, '<', $TODO_FILE or croak "Could not open $TODO_FILE: $ERRNO";
     while (my $line = <$todo_fh>) {
         debug "Checking: $line";
-        $line =~ /due:(\d{2,4}[.]\d{1,2}[.]\d{1,2})/xms;
-        my $entry_date = $1;
-        if (defined $entry_date) {
-            my $canonical_entry_date = get_canonical_date($entry_date);
+        if ($line =~ /due:(\d{2,4}[.]\d{1,2}[.]\d{1,2})/xms) {
+            my $canonical_entry_date = get_canonical_date($1);
             print_colored($line_number . q/ / . $line)  if $canonical_entry_date le $due_date;
         }
         $line_number++;
