@@ -51,7 +51,7 @@ Readonly my $GIT_CMD        => 'git';
 Readonly my @GIT_ARGS       => qw(commit -a -m "commit by t");
 Readonly my @MKDIR_CMD_ARGS => qw(mkdir -p "$BACKUP_DIR");
 Readonly my $COPY_CMD       => q(cp);
-Readonly my @EDIT_CMD       => qw(vim $TODO_FILE);
+Readonly my @EDIT_CMD       => qq(vim $TODO_FILE);
 
 sub get_now_string {
     my @time_elems = localtime;
@@ -70,6 +70,19 @@ sub get_now_string {
     if ($second < 10) { $second = "0$second"; }
 
     return "$year.$mon.$day $hour:$minute:$second";
+}
+
+
+sub today {
+    my @time_elems = localtime;
+    my $year = $time_elems[5] + 1900;
+    my $mon = $time_elems[4] + 1;
+    my $day = $time_elems[3];
+
+    if ($mon < 10) { $mon = "0$mon"; }
+    if ($day < 10) { $day = "0$day"; }
+
+    return "$year.$mon.$day";
 }
 
 sub debug {
@@ -123,19 +136,6 @@ func get_canonical_date($date) {
     return $ret_val;
 }
 
-
-sub today {
-    my @time_elems = localtime;
-    my $year = $time_elems[5] + 1900;
-    my $mon = $time_elems[4] + 1;
-    my $day = $time_elems[3];
-
-    if ($mon < 10) { $mon = "0$mon"; }
-    if ($day < 10) { $day = "0$day"; }
-
-    return "$year.$mon.$day";
-}
-
 func print_colored($line) {
     given ($line) {
         when (/^\d*\s*[(]A[)]/xms) { print colored($line, 'yellow')  }
@@ -150,27 +150,17 @@ func print_colored($line) {
 func lsdue($date) {
     my $due_date = get_canonical_date($date);
 
-    open my $todo_fh, '<', $TODO_FILE or croak "Could not open $TODO_FILE: $ERRNO";
     my $line_number = 1;
+    open my $todo_fh, '<', $TODO_FILE or croak "Could not open $TODO_FILE: $ERRNO";
     while (my $line = <$todo_fh>) {
         debug "Checking: $line";
-        my $entry_date = $line =~ /due:(\d{2,4}[.]\d{1,2}[.]\d{1,2})/xms;
- #       my $entry_date = $1;
-        if (defined $entry_date) {
-            my $canonical_entry_date = get_canonical_date($entry_date);
+        if ($line =~ /due:(\d{2,4}[.]\d{1,2}[.]\d{1,2})/xms) {
+            my $canonical_entry_date = get_canonical_date($1);
             print_colored($line_number . q/ / . $line)  if $canonical_entry_date le $due_date;
         }
         $line_number++;
     }
     close $todo_fh or croak "Closing file $TODO_FILE: $ERRNO";;
-}
-
-func lscon($context) {
-    ls_conditional('@' . $context);
-}
-
-func lsprj($project) {
-    ls_conditional('+' . $project);
 }
 
 func ls_conditional($condition) {
@@ -194,17 +184,14 @@ if ($#ARGV >= 0) {
     }
 
     given ($first_cmd) {
-        when (/^backup$/xms)                { backup();           exit; }
-        when (/^edit$/xms || /^e$/xms)      { edit();             exit; }
-        when (/^vers/xms)                   { versioned_backup(); exit; }
-        when (/^due$/xms)                   { lsdue($second_cmd); exit; }
-        when (/^lsc$/xms)                   { lscon($second_cmd); exit; }
-        when (/^lsprj$/xms)                 { lsprj($second_cmd); exit; }
-        when (/^h/xms)                      { help();             exit; }
+        when (/^backup$/xms)                { backup();                          exit; }
+        when (/^edit$/xms || /^e$/xms)      { edit();                            exit; }
+        when (/^vers/xms)                   { versioned_backup();                exit; }
+        when (/^due$/xms)                   { lsdue($second_cmd);                exit; }
+        when (/^lsc$/xms)                   { ls_conditional('@' + $second_cmd); exit; }
+        when (/^lsprj$/xms)                 { ls_conditional('+' . $second_cmd); exit; }
+        when (/^h/xms)                      { help();                            exit; }
     }
-
-    # End, as we already called our custom commands
-    exit;
 }
 
 # Otherwise call the regular todo.sh
