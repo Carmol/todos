@@ -105,11 +105,13 @@ sub versioned_backup {
 
 sub backup {
     if (! -d $BACKUP_DIR) {
-        system @MKDIR_CMD_ARGS and croak "mkdir '$BACKUP_DIR': $ERRNO $CHILD_ERROR";
+        system @MKDIR_CMD_ARGS
+		and croak "mkdir '$BACKUP_DIR': $ERRNO $CHILD_ERROR";
     }
 
     foreach my $file (@FILES) {
-        system $COPY_CMD, $file, $BACKUP_DIR  and croak "Backup $file: $ERRNO $CHILD_ERROR";
+        system $COPY_CMD, $file, $BACKUP_DIR
+		and croak "Backup $file: $ERRNO $CHILD_ERROR";
     }
 }
 
@@ -118,8 +120,10 @@ sub edit {
 }
 
 sub help {
-    print colored("$PROGRAM_NAME [backup|versioning|edit|e|due [<yyyy.mm.dd>]|lsc <context>"
-        . "|lsprj <project>|help] or the commands of todo.sh (see t -h)\n", 'blue');
+    print colored("$PROGRAM_NAME "
+	. '[backup|versioning|edit|e|due [<yyyy.mm.dd>]|lsc <context>'
+        . '|lsprj <project>|help] or the commands of todo.sh '
+	. "(see t -h)\n", 'blue');
 }
 
 func get_canonical_date($date) {
@@ -170,7 +174,8 @@ func ls_conditional($condition) {
         print_colored("$counter $line")     if $line =~ /$condition/ixms;
         $counter++;
     }
-    close $TODO and croak("Could not close read-only file $TODO_FILE: $ERRNO");
+    close $TODO
+	and croak("Could not close read-only file $TODO_FILE: $ERRNO");
 }
 
 # Start of the program
@@ -184,13 +189,13 @@ if ($#ARGV >= 0) {
     }
 
     given ($first_cmd) {
-        when (/^backup$/xms)                { backup();                          exit; }
-        when (/^edit$/xms || /^e$/xms)      { edit();                            exit; }
-        when (/^vers/xms)                   { versioned_backup();                exit; }
-        when (/^due$/xms)                   { lsdue($second_cmd);                exit; }
-        when (/^lsc$/xms)                   { ls_conditional('@' + $second_cmd); exit; }
-        when (/^lsprj$/xms)                 { ls_conditional('+' . $second_cmd); exit; }
-        when (/^h/xms)                      { help();                            exit; }
+        when (/^backup$/xms)   { backup();                          exit; }
+        when (/^edit$/xms || /^e$/xms)                  { edit();   exit; }
+        when (/^vers/xms)      { versioned_backup();                exit; }
+        when (/^due$/xms)      { lsdue($second_cmd);                exit; }
+        when (/^lsc$/xms)      { ls_conditional('@' + $second_cmd); exit; }
+        when (/^lsprj$/xms)    { ls_conditional('+' . $second_cmd); exit; }
+        when (/^h/xms)         { help();                            exit; }
     }
 }
 
