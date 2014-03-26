@@ -29,7 +29,7 @@
 #
 # ee, February 2013
 
-use 5.00101;
+use v5.0012;
 
 use strict;
 use warnings;
