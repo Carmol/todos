@@ -46,7 +46,6 @@ Readonly my $TODO_BIN       => './todo.sh';
 Readonly my $BACKUP_DIR     => "$HOME/Documents/Backups/todo/";
 Readonly my $TODO_FILE      => 'todo.txt';
 Readonly my @FILES          => ('done.txt', 'report.txt', $TODO_FILE);
-Readonly my $DEBUG          => 0;
 Readonly my $GIT_CMD        => 'git';
 Readonly my @GIT_ARGS       => qw(commit -a -m "commit by t");
 Readonly my @MKDIR_CMD_ARGS => qw(mkdir -p "$BACKUP_DIR");
@@ -85,18 +84,6 @@ sub today {
     return "$year.$mon.$day";
 }
 
-sub debug {
-    if ($DEBUG) {
-        my @print_message = (get_now_string());
-        push @print_message, @ARG;
-        if ($print_message[-1] !~ /\n$/xms)  {
-            push @print_message, "\n";
-        }
-
-        carp @print_message;
-    }
-}
-
 sub versioned_backup {
     backup();
     chdir $BACKUP_DIR or croak "Could not cd to $BACKUP_DIR: $ERRNO";
@@ -133,11 +120,7 @@ func get_canonical_date($date) {
     if (length($month) == 1) { $month = "0$month";     }
     if (length($day)   == 1) { $day   = "0$day";       }
     
-    my $ret_val = "$year.$month.$day";
-
-    debug "get_canonical_date - returning: $ret_val";
-
-    return $ret_val;
+    return "$year.$month.$day";
 }
 
 func print_colored($line) {
@@ -155,9 +138,9 @@ func lsdue($date) {
     my $due_date = get_canonical_date($date);
 
     my $line_number = 1;
-    open my $todo_fh, '<', $TODO_FILE or croak "Could not open $TODO_FILE: $ERRNO";
+    open my $todo_fh, '<', $TODO_FILE
+   	or croak "Could not open $TODO_FILE: $ERRNO";
     while (my $line = <$todo_fh>) {
-        debug "Checking: $line";
         if ($line =~ /due:(\d{2,4}[.]\d{1,2}[.]\d{1,2})/xms) {
             my $canonical_entry_date = get_canonical_date($1);
             print_colored($line_number . q/ / . $line)  if $canonical_entry_date le $due_date;
