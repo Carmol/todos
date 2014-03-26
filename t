@@ -163,14 +163,6 @@ func lsdue($date) {
     close $todo_fh or croak "Closing file $TODO_FILE: $ERRNO";;
 }
 
-func lscon($context) {
-    ls_conditional('@' . $context);
-}
-
-func lsprj($project) {
-    ls_conditional('+' . $project);
-}
-
 func ls_conditional($condition) {
     open my $TODO, '<', $TODO_FILE or croak "Could not open $TODO_FILE: $ERRNO";
     my $counter = 1;
@@ -186,19 +178,19 @@ chdir $TODO_DIR or croak "Could not cd '$TODO_DIR': $ERRNO\n";
 
 if ($#ARGV >= 0) {
     my $first_cmd = $ARGV[0];
-    my $second_cmd = today();
+    my $second_cmd;
     if ($#ARGV >= 1) {
         $second_cmd = $ARGV[1];
     }
 
     given ($first_cmd) {
-        when (/^backup$/xms)                { backup();           exit; }
-        when (/^edit$/xms || /^e$/xms)      { edit();             exit; }
-        when (/^vers/xms)                   { versioned_backup(); exit; }
-        when (/^due$/xms)                   { lsdue($second_cmd); exit; }
-        when (/^lsc$/xms)                   { lscon($second_cmd); exit; }
-        when (/^lsprj$/xms)                 { lsprj($second_cmd); exit; }
-        when (/^h/xms)                      { help();             exit; }
+        when (/^backup$/xms)                { backup();                          exit; }
+        when (/^edit$/xms || /^e$/xms)      { edit();                            exit; }
+        when (/^vers/xms)                   { versioned_backup();                exit; }
+        when (/^due$/xms)                   { lsdue($second_cmd);                exit; }
+        when (/^lsc$/xms)                   { ls_conditional('@' + $second_cmd); exit; }
+        when (/^lsprj$/xms)                 { ls_conditional('+' . $second_cmd); exit; }
+        when (/^h/xms)                      { help();                            exit; }
     }
 }
 
