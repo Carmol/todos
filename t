@@ -29,7 +29,7 @@
 #
 # ee, February 2013
 
-use v5.10.1;
+use 5.00101;
 
 use strict;
 use warnings;
@@ -154,8 +154,8 @@ func lsdue($date) {
     my $line_number = 1;
     while (my $line = <$todo_fh>) {
         debug "Checking: $line";
-        $line =~ /due:(\d{2,4}[.]\d{1,2}[.]\d{1,2})/xms;
-        my $entry_date = $1;
+        my $entry_date = $line =~ /due:(\d{2,4}[.]\d{1,2}[.]\d{1,2})/xms;
+ #       my $entry_date = $1;
         if (defined $entry_date) {
             my $canonical_entry_date = get_canonical_date($entry_date);
             print_colored($line_number . q/ / . $line)  if $canonical_entry_date le $due_date;
