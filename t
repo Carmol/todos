@@ -123,19 +123,6 @@ func get_canonical_date($date) {
     return $ret_val;
 }
 
-
-sub today {
-    my @time_elems = localtime;
-    my $year = $time_elems[5] + 1900;
-    my $mon = $time_elems[4] + 1;
-    my $day = $time_elems[3];
-
-    if ($mon < 10) { $mon = "0$mon"; }
-    if ($day < 10) { $day = "0$day"; }
-
-    return "$year.$mon.$day";
-}
-
 func print_colored($line) {
     given ($line) {
         when (/^\d*\s*[(]A[)]/xms) { print colored($line, 'yellow')  }
