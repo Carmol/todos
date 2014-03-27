@@ -172,19 +172,18 @@ func ls_conditional($condition) {
 chdir $TODO_DIR or croak "Could not cd '$TODO_DIR': $ERRNO\n";
 
 if ( $#ARGV >= 0 ) {
-    my $first_cmd  = $ARGV[0];
-    my $second_cmd = today();
-    if ( $#ARGV >= 1 ) {
-        $second_cmd = $ARGV[1];
-    }
+    my $first_arg  = $ARGV[0];
+    my $second_arg = (defined $ARGV[1] ? $ARGV[1] : today());
+
+    croak "2nd command is $second_arg";
 
     given ($first_cmd) {
         when (/^backup$/xms) { backup(); exit; }
         when ( /^edit$/xms || /^e$/xms ) { edit(); exit; }
         when (/^vers/xms)   { versioned_backup();                  exit; }
-        when (/^due$/xms)   { lsdue($second_cmd);                  exit; }
-        when (/^lsc$/xms)   { ls_conditional( '@' + $second_cmd ); exit; }
-        when (/^lsprj$/xms) { ls_conditional( '+' . $second_cmd ); exit; }
+        when (/^due$/xms)   { lsdue($second_arg);                  exit; }
+        when (/^lsc$/xms)   { ls_conditional( '@' + $second_arg ); exit; }
+        when (/^lsprj$/xms) { ls_conditional( '+' . $second_arg ); exit; }
         when (/^h/xms)      { help();                              exit; }
     }
 }
