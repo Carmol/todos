@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 #
-# t         Wrapper around todo.sh
+# todo.pl         Wrapper around todo.sh
 #
 # Calls todo.sh where it is installed ($TODO_DIR).
 # t can be installed in the path; it chdirs to $TODO_DIR and calls

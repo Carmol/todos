@@ -1,4 +1,4 @@
-t - A Wrapper and Frontend around todo.sh
+todo.pl - A Wrapper and Frontend around todo.sh
 ================
 
 Calls todo.sh where it is installed ($TODO_DIR).
