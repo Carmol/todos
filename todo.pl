@@ -145,11 +145,12 @@ func lsdue($date) {
     my $line_number = 1;
     open my $todo_fh, '<', $TODO_FILE
         or croak "Could not open $TODO_FILE: $ERRNO";
-    while ( my $line = <$todo_fh> ) {
-        if ( $line =~ /due:(\d{2,4}[.]\d{1,2}[.]\d{1,2})/xms ) {
+    while (my $line = <$todo_fh>) {
+        if ($line =~ /due:(\d{2,4}[.]\d{1,2}[.]\d{1,2})/xms) {
             my $canonical_entry_date = get_canonical_date($1);
-            print_colored( $line_number . q/ / . $line )
-                if $canonical_entry_date le $due_date;
+            if ($canonical_entry_date le $due_date) {
+                print_colored($line_number . q/ / . $line);
+            }
         }
         $line_number++;
     }
@@ -160,7 +161,7 @@ func ls_conditional($condition) {
     open my $TODO, '<', $TODO_FILE
         or croak "Could not open $TODO_FILE: $ERRNO";
     my $counter = 1;
-    while ( my $line = <$TODO> ) {
+    while (my $line = <$TODO>) {
         print_colored("$counter $line") if $line =~ /$condition/ixms;
         $counter++;
     }
@@ -171,7 +172,7 @@ func ls_conditional($condition) {
 # Start of the program
 chdir $TODO_DIR or croak "Could not cd '$TODO_DIR': $ERRNO\n";
 
-if ( $#ARGV >= 0 ) {
+if ($#ARGV >= 0) {
     my $first_arg  = $ARGV[0];
     my $second_arg = (defined $ARGV[1] ? $ARGV[1] : today());
 
