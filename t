@@ -175,8 +175,6 @@ if ( $#ARGV >= 0 ) {
     my $first_arg  = $ARGV[0];
     my $second_arg = (defined $ARGV[1] ? $ARGV[1] : today());
 
-    croak "2nd command is $second_arg";
-
     given ($first_cmd) {
         when (/^backup$/xms) { backup(); exit; }
         when ( /^edit$/xms || /^e$/xms ) { edit(); exit; }
