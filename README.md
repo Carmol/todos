@@ -17,19 +17,19 @@ todo.sh:
   * edit   
  Starts editing todo.txt in vim
 
-  * vers
+  * vers   
  Creates git based "versioned" backup
 
-  * due <date>
+  * due <date>   
  Lists all tasks are due since/by date or by today, if data is omitted
 
-  * lsc <context>
+  * lsc <context>   
  Lists all tasks of a particular context
 
-  * lsprj <project>
+  * lsprj <project>   
  Lists all tasks of a particular project
 
-  * help
+  * help   
  Prints a (very brief) help line
 
 Any other command is passed through to "todo.sh"
