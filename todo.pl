@@ -120,7 +120,12 @@ sub help {
 func get_canonical_date($date) {
     my ( $year, $month, $day ) = split q/./, $date;
 
-    if ( length($year) <= 2 ) { $year = 2000 + $year; }
+    if (!defined $year or length $year <= 0) {
+        return today();
+    }
+
+    if ( length($year) <= 2 ) { $year = 2000 + $year; } 
+    carp "Year: $year";
     if ( length($month) == 1 ) { $month = "0$month"; }
     if ( length($day) == 1 )   { $day   = "0$day"; }
 
@@ -176,7 +181,7 @@ if ($#ARGV >= 0) {
     my $first_arg  = $ARGV[0];
     my $second_arg = (defined $ARGV[1] ? $ARGV[1] : today());
 
-    given ($first_cmd) {
+    given ($first_arg) {
         when (/^backup$/xms) { backup(); exit; }
         when ( /^edit$/xms || /^e$/xms ) { edit(); exit; }
         when (/^vers/xms)   { versioned_backup();                  exit; }
