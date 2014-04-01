@@ -118,15 +118,15 @@ sub help {
 }
 
 func get_canonical_date($date) {
-    my ( $year, $month, $day ) = split q/./, $date;
+    my ($year, $month, $day) = split q/./, $date;
 
     if (!defined $year or length $year == 0) {
         return today();
     }
 
-    if ( length($year) <= 2 ) { $year = 2000 + $year; } 
-    if ( length($month) == 1 ) { $month = "0$month"; }
-    if ( length($day) == 1 )   { $day   = "0$day"; }
+    if (length($year) <= 2) { $year = 2000 + $year; } 
+    if (length($month) == 1) { $month = "0$month"; }
+    if (length($day) == 1)   { $day   = "0$day"; }
 
     return "$year.$month.$day";
 }
