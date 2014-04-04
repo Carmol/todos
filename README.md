@@ -38,5 +38,5 @@ Open
 ----
 1. Combine various commands, e.g., like this:   
 todo.pl due date lsc context lsprj project
-2. Refactoring
-
+2. Refactoring    
+External lib, may be?
