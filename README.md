@@ -36,7 +36,7 @@ Any other command is passed through to "todo.sh"
 
 Open 
 ----
-Combine various commands, e.g., like this:
-
+1. Combine various commands, e.g., like this:   
 todo.pl due date lsc context lsprj project
+2. Refactoring
 
